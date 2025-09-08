@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matricería - Pedido Express</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+        :root {
+            --color-bg: #121212;
+            --color-card: #1e1e1e;
+            --color-text: #e0e0e0;
+            --color-primary: #8a2be2;
+            --color-accent: #00ffff;
+            --color-secondary: #ff00ff;
+            --color-border: #444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: 'Roboto Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px;
+            gap: 40px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .glitch {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            color: var(--color-primary);
+            text-shadow: -2px -2px 0 var(--color-accent), 2px 2px 0 var(--color-secondary);
+            position: relative;
+            animation: glitch-anim 2s infinite;
+            letter-spacing: 0.1em;
+        }
+
+        .glitch:before, .glitch:after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-card);
+            overflow: hidden;
+            clip: rect(0, 900px, 0, 0);
+            z-index: -1;
+        }
+
+        .glitch:before {
+            text-shadow: 3px 3px 0 var(--color-accent);
+            animation: glitch-anim-before 2s infinite;
+        }
+
+        .glitch:after {
+            text-shadow: -3px -3px 0 var(--color-secondary);
+            animation: glitch-anim-after 2s infinite;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes glitch-anim-before {
+            0% { transform: translate(0); }
+            20% { transform: translate(2px, -2px); }
+            40% { transform: translate(5px, 0); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(-5px, 0); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes glitch-anim-after {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-5px, 0); }
+            60% { transform: translate(2px, -2px); }
+            80% { transform: translate(5px, 0); }
+            100% { transform: translate(0); }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 40px;
+            border-top: 1px solid var(--color-border);
+            padding-top: 40px;
+        }
+
+        .insumos-section {
+            background-color: var(--color-card);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--color-border);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+        }
+        
+        .insumos-section h2 {
+            font-size: 1.5em;
+            color: var(--color-accent);
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #2a2a2a;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .insumos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .insumo-item {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .insumo-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.5);
+        }
+
+        .insumo-item h3 {
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--color-accent);
+        }
+
+        .insumo-item .input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .insumo-item .input-group input {
+            width: 60px;
+            background: #121212;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            padding: 5px;
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+            text-align: center;
+        }
+
+        .insumo-add-btn {
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .insumo-add-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .cart-section {
+            background-color: var(--color-card);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--color-border);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.1);
+            position: sticky;
+            top: 40px;
+            height: fit-content;
+        }
+        
+        .cart-section h2 {
+            font-size: 1.5em;
+            color: var(--color-primary);
+            border-bottom: 2px solid var(--color-accent);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .item-count {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            font-weight: 700;
+        }
+
+        .cart-list {
+            list-style: none;
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 20px;
+        }
+
+        .cart-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid var(--color-border);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cart-list li:first-child {
+            border-top: none;
+        }
+
+        .cart-list li span {
+            color: var(--color-text);
+        }
+        
+        .cart-list li .cart-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-list li .cart-controls button {
+            background: none;
+            border: none;
+            color: var(--color-text);
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: color 0.2s;
+        }
+
+        .cart-list li .cart-controls button:hover {
+            color: var(--color-primary);
+        }
+
+        .empty-cart-message {
+            text-align: center;
+            color: #aaa;
+            padding: 20px;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--color-primary);
+            color: var(--color-text);
+            border: 2px solid var(--color-accent);
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .buy-btn:hover {
+            background-color: #791bd5;
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .cart-section {
+                position: static;
+            }
+        }
+    </style>
+    <script>
+        const insumosData = [
+            "Rodamientos 6001", "Arandelas M6", "Arandelas M8", "Arandelas M12", "Tornillos Cabeza Allen M8 x 10mm", "Tornillos Cabeza Allen M8 x 15mm", "Tornillos Cabeza Allen M8 x 20 mm", "Tornillos Cabeza Allen M8 x 25 mm", "Tornillos Cabeza Allen M8 x 30 mm", "Tornillos Cabeza Allen M6 x 10 mm", "Tornillos Cabeza Allen M6 x 15 mm", "Tornillos Cabeza Allen M6 x 20 mm", "Tornillos Cabeza Allen M6 x 25 mm", "Tornillos Cabeza Allen M6 x 30 mm", "Tornillos Autoperforantes T2 punta mecha 8x1 25 mm", "Arandela Plana 3/4", "Arandela de suplemento M12 x 20 mm", "Arandela Segger ext. 11 mm", "Tuerca Mariposa M6", "Tuerca Mariposa M8", "Tuerca Hexagonal M6", "Tuerca Hexagonal M8"
+        ];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+            const insumosGrid = document.getElementById('insumos-grid');
+            const cartList = document.getElementById('cart-list');
+            const emptyCartMessage = document.getElementById('empty-cart-message');
+            const buyButton = document.getElementById('buy-button');
+            const itemCountSpan = document.getElementById('item-count');
+            const cart = new Map();
+
+            function renderInsumos(filter = '') {
+                insumosGrid.innerHTML = '';
+                const filteredData = insumosData.filter(insumo => 
+                    insumo.toLowerCase().includes(filter.toLowerCase())
+                );
+                
+                filteredData.forEach(insumo => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'insumo-item';
+                    itemDiv.innerHTML = `
+                        <h3>${insumo}</h3>
+                        <div class="input-group">
+                            <input type="number" value="1" min="1" class="quantity-input">
+                            <button class="insumo-add-btn" data-insumo="${insumo}">+</button>
+                        </div>
+                    `;
+                    insumosGrid.appendChild(itemDiv);
+                });
+            }
+
+            renderInsumos();
+
+            searchInput.addEventListener('input', (e) => {
+                renderInsumos(e.target.value);
+            });
+
+            insumosGrid.addEventListener('click', (e) => {
+                const targetBtn = e.target.closest('.insumo-add-btn');
+                if (targetBtn) {
+                    const insumo = targetBtn.dataset.insumo;
+                    const quantityInput = targetBtn.closest('.insumo-item').querySelector('.quantity-input');
+                    const quantity = parseInt(quantityInput.value);
+                    
+                    if (quantity > 0) {
+                        addToCart(insumo, quantity);
+                        quantityInput.value = "1";
+                    } else {
+                        alert("La cantidad debe ser mayor a cero.");
+                    }
+                }
+            });
+
+            cartList.addEventListener('click', (e) => {
+                const targetBtn = e.target.closest('button');
+                if (targetBtn) {
+                    const insumo = targetBtn.dataset.insumo;
+                    if (targetBtn.classList.contains('remove-btn')) {
+                        removeFromCart(insumo);
+                    } else if (targetBtn.classList.contains('increase-btn')) {
+                        addToCart(insumo, 1);
+                    } else if (targetBtn.classList.contains('decrease-btn')) {
+                        decreaseFromCart(insumo, 1);
+                    }
+                }
+            });
+
+            buyButton.addEventListener('click', enviarPedido);
+
+            function addToCart(insumo, quantity) {
+                if (cart.has(insumo)) {
+                    cart.set(insumo, cart.get(insumo) + quantity);
+                } else {
+                    cart.set(insumo, quantity);
+                }
+                updateCartUI();
+            }
+
+            function decreaseFromCart(insumo, quantity) {
+                if (cart.has(insumo)) {
+                    const newQuantity = cart.get(insumo) - quantity;
+                    if (newQuantity <= 0) {
+                        cart.delete(insumo);
+                    } else {
+                        cart.set(insumo, newQuantity);
+                    }
+                    updateCartUI();
+                }
+            }
+
+            function removeFromCart(insumo) {
+                cart.delete(insumo);
+                updateCartUI();
+            }
+
+            function updateCartUI() {
+                cartList.innerHTML = '';
+                if (cart.size === 0) {
+                    emptyCartMessage.style.display = 'block';
+                    buyButton.disabled = true;
+                    itemCountSpan.textContent = "0";
+                } else {
+                    emptyCartMessage.style.display = 'none';
+                    buyButton.disabled = false;
+                    itemCountSpan.textContent = cart.size;
+                    cart.forEach((quantity, insumo) => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span>${insumo}</span>
+                            <div class="cart-controls">
+                                <button class="decrease-btn" data-insumo="${insumo}">-</button>
+                                <span>${quantity}</span>
+                                <button class="increase-btn" data-insumo="${insumo}">+</button>
+                                <button class="remove-btn" data-insumo="${insumo}">&times;</button>
+                            </div>
+                        `;
+                        cartList.appendChild(li);
+                    });
+                }
+            }
+
+            function enviarPedido() {
+                const destinatario = 'compras@tudominio.com';
+                const asunto = 'Pedido de Insumos de Matricería';
+                let cuerpoCorreo = "Hola,\n\nSe requiere la compra de los siguientes insumos:\n\n";
+
+                cart.forEach((quantity, insumo) => {
+                    cuerpoCorreo += `- ${insumo} (Cantidad: ${quantity})\n`;
+                });
+
+                cuerpoCorreo += "\nSaludos.";
+                
+                const asuntoCodificado = encodeURIComponent(asunto);
+                const cuerpoCodificado = encodeURIComponent(cuerpoCorreo);
+                
+                window.location.href = `mailto:${destinatario}?subject=${asuntoCodificado}&body=${cuerpoCodificado}`;
+            }
+
+            updateCartUI();
+        });
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="glitch" data-text="MATRICERIA.EXE">MATRICERIA.EXE</h1>
+        </header>
+        
+        <main class="main-content">
+            <section class="insumos-section">
+                <h2>Catálogo de Insumos</h2>
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Buscar insumos...">
+                </div>
+                <div id="insumos-grid" class="insumos-grid">
+                    </div>
+            </section>
+            
+            <aside class="cart-section">
+                <h2>Tu Pedido <span id="item-count" class="item-count">0</span></h2>
+                <ul id="cart-list" class="cart-list"></ul>
+                <p id="empty-cart-message" class="empty-cart-message">El carrito está vacío. Agrega algunos insumos.</p>
+                <div class="button-container">
+                    <button id="buy-button" class="buy-btn" disabled>GENERAR PEDIDO</button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+</body>
+</html>
